@@ -1,20 +1,22 @@
 import pandas as pd
 from pandasql import sqldf
-import pandas as pd
 from datetime import datetime, timedelta
 
 # Filter data for only the prior n years
 num_years = 2 
 
+# Count the top n performances in the given timeframe
+num_performances = 10
+
 # Print top n players
-top_num_players = 20
+num_top_players = 20
 
 # Filter data for events of type Elo, Das, or Friendly.
 match_type = 'ELO'
 possible_types = ['ELO', 'DAS', 'FRIENDLY']
 
 
-def assign_points(row):
+def elo_points(row):
     ctm_events = ['CTM Masters', 'CTM Challengers', 'CTM Futures', 'CTM Hopefuls']
 
     event_stage_points = {
@@ -53,8 +55,6 @@ def assign_points(row):
         return stage_points or 0
     
     return 0
-
-
 
 def points_agg(points, event):
     ctm_points = {
@@ -106,6 +106,9 @@ def top_performances(list, n):
 sheet_id = "1Rw1XT90YD8HvYN4JS0Ba1tgkp7UlrG4ksPuP4Yc4SNM"
 gid = "658545272"
 
+das_sheet_id = "1nEN0MAbueG36UDkpfUsPZEmAMuKif6IcLAmJ8iZhCe8"
+das_gid = "805197322"
+
 url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv&gid={gid}"
 
 # Read the data into a DataFrame
@@ -127,10 +130,8 @@ df.loc[switch, ['Winner', 'Loser', 'Wins', 'Losses']] = df.loc[switch, ['Loser',
 # Convert dates to datetime
 df['Date'] = pd.to_datetime(df['Date'], format='%d/%m/%Y %H:%M:%S')
 
-# Calculate the date n years ago from today, plus one in case of leap year
-time_frame = datetime.now() - timedelta(days= num_years * 365 + 1)
-
 # Filter rows with dates within the last n years
+time_frame = datetime.now() - timedelta(days= num_years * 365 + 1)
 df = df[df['Date'] >= time_frame]
 
 # Reshape dataframe 
@@ -138,12 +139,11 @@ winners_df = df[['Match', 'Winner', 'Event', 'Edition', 'Date', 'Stage', 'Locati
 winners_df['Outcome'] = 'Win'
 losers_df = df[['Match', 'Loser', 'Event', 'Edition', 'Date', 'Stage', 'Location', 'Type']].rename(columns={'Loser': 'Player'})
 losers_df['Outcome'] = 'Lose'
-
 df = pd.concat([winners_df, losers_df])
 
-
+# Enter initial point values for each match at notable events
 df['Points'] = 0
-df['Points'] = df.apply(assign_points, axis=1)
+df['Points'] = df.apply(elo_points, axis=1)
 
 
 
@@ -163,7 +163,7 @@ players_df = players_df.rename_axis(None, axis=1).reset_index()
 players_df = players_df[['Player', 'Wins', 'Losses']]
 
 # Add Total Points column to players dataframe
-player_points = event_results_df.groupby('Player')['Event_Points'].agg(top_performances, 10)
+player_points = event_results_df.groupby('Player')['Event_Points'].agg(top_performances, num_performances)
 players_df['Total_Points'] = players_df['Player'].map(player_points)
 players_df['Total_Points'] = players_df['Total_Points'].fillna(0)
 players_df['Total_Points'] = players_df['Total_Points'].astype(int)
@@ -173,6 +173,12 @@ players_df.index += 1
 
 pd.set_option('display.max_rows', None)
 
-print(players_df.head(top_num_players))
+print(players_df.head(num_top_players))
 
+# execute = lambda q: sqldf(q, globals())
+# query = "SELECT DISTINCT(Event) FROM df ORDER BY Event"
+# query_df = execute(query)
+# print(query_df)
+
+# print(df.head())
 
