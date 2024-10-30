@@ -51,7 +51,8 @@ def modify_event(row):
     return row['Event']
 
 def das_points(row):
-    sixteen_bracket_events = ['CTM DAS Masters', 'CTM DAS World Circuit', 'CTM DAS Major Circuit', 'CTM DAS Super Circuit', 'CTM Lone Star DAS']
+    simple_bracket_events = ['CTM DAS Masters', 'CTM DAS World Circuit', 'CTM DAS Major Circuit', 'CTM DAS Super Circuit', 'CTM Lone Star DAS']
+    exception_events = {'CT DAS': '2022'}
 
     event_stage_points = {
         'Jonas Cup': {
@@ -62,8 +63,17 @@ def das_points(row):
             'Round 1': 100,
             'Round 0': 50
         },
-        'CTWC Das': 
-        {'2023': {
+        'CTWC DAS': 
+        {
+        '2022': {
+            'Final': {'Win': 2000, 'Lose': 1200},
+            '3rd-place match': {'Win': 1000, 'Lose': 800},
+            'Quarter-final': 400,
+            'Round of 16': 200,
+            'Round of 32': 100,
+            'Round of 48': 50
+        },
+        '2023': {
             'Final': {'Win': 2000, 'Lose': 1200},
             '3rd-place match': {'Win': 1000, 'Lose': 800},
             'Quarter-final': 400,
@@ -87,7 +97,7 @@ def das_points(row):
             'Losers Round 0': 50
         }
         },
-        'Lone Star Das': {
+        'Lone Star DAS': {
             'Final': {'Win': 1000, 'Lose': 600},
             'Semi-final': 300,
             'Quarter-final': 100,
@@ -96,9 +106,9 @@ def das_points(row):
     }
 
     event = row.get('Event')
-    if event == 'CTWC Das':
-        year = row.get('Edition')
-        points_dict = event_stage_points[event][year]
+    edition = row.get('Edition')
+    if event == 'CTWC DAS':
+        points_dict = event_stage_points[event][edition]
         stage_points = points_dict.get(row['Stage'])
         if isinstance(stage_points, dict):
             return stage_points[row['Outcome']]
@@ -109,8 +119,8 @@ def das_points(row):
         if isinstance(stage_points, dict):
             return stage_points[row['Outcome']]
         return stage_points or 0
-            
-    elif event in sixteen_bracket_events:
+    
+    elif event in simple_bracket_events or (event in exception_events and edition == exception_events[event]):
         outcome = row['Outcome']
         return 2 if outcome == 'Win' else 1
         
@@ -118,7 +128,7 @@ def das_points(row):
 
 def points_agg(points, event):
     # CT DAS Minor is also a 16 person bracket, but has bo3(bo3) format until bo5(bo3) in the finals 
-    sixteen_bracket_points = {
+    simple_bracket_points = {
         'CTM DAS Masters': {
             0: 0,
             1: 100,
@@ -158,18 +168,25 @@ def points_agg(points, event):
             5: 600,
             7: 1000,
             8: 1600
+        },
+        'CT DAS': {
+            0: 0,
+            1: 50,
+            3: 100,
+            5: 200,
+            7: 400,
+            9: 800,
+            11: 1200,
+            12: 2000
         }
     }
 
-
-    # exceptions = ['CT Das']
     event_name = event.iloc[0]
-    if event_name in sixteen_bracket_points:
+    if event_name in simple_bracket_points:
         total_points = points.sum()
-        return sixteen_bracket_points[event_name].get(total_points, 0)
+        return simple_bracket_points[event_name].get(total_points, 0)
     else:
         return points.max()
-
 
 def top_performances(list, n):
     return sum(sorted(list, reverse=True)[:n])
@@ -189,7 +206,10 @@ df = pd.read_csv(url, usecols=cols)
 df = df.drop(['Unnamed: 5'], axis=1)
 df = df.rename(columns={'Player1': 'Winner', 'Unnamed: 2': 'Wins', 'Unnamed: 3': 'Losses', 'Player2': 'Loser', 'Edition/Round': 'Info', 'Date/Time (UTC)': 'Date'})
 
+# Fill null event entries
+df['Event'] = df['Event'].fillna("NA")
 
+df['Event'] = df['Event'].str.replace('Das', 'DAS')
 
 # Drop friendly events
 if drop_friendlies:
@@ -211,11 +231,22 @@ df['Event'] = df['Event'].fillna('None')
 time_frame = datetime.now() - timedelta(days = num_years * 365 + 1)
 df = df[df['Date'] >= time_frame]
 
+# Separate Date column into date and time columns
 df['Time'] = df['Date'].dt.time
 df['Date'] = df['Date'].dt.date
 
+ct_das_df = df[df['Event'].str.contains('CT DAS')]
+
+switch = ct_das_df['Winner'] > ct_das_df['Loser']
+ct_das_df.loc[switch, ['Winner', 'Wins', 'Losses', 'Loser']] = ct_das_df.loc[switch, ['Loser', 'Losses', 'Wins', 'Winner']].values
+
+print(ct_das_df.groupby(['Winner', 'Loser', 'Event', 'Info', 'Date']))
+print(ct_das_df.groupby('Event').count())
+
+
 # Drop duplicate rows
 df = df.drop_duplicates(['Winner', 'Wins', 'Losses', 'Loser', 'Event', 'Info', 'Date', 'Time'])
+
 
 
 # Reshape dataframe
@@ -264,13 +295,13 @@ players_df['Total_Points'] = players_df['Total_Points'].astype(int)
 players_df = players_df.sort_values(by='Total_Points', ascending=False).reset_index(drop=True)
 players_df.index += 1
 
-# print(players_df.head(20))
+print(players_df.head(20))
 
 player = "SHARKY"
 best_results = event_results_df.loc[event_results_df['Player'] == player]
 best_results = best_results.sort_values(by='Event_Points', ascending=False)
 
-print(best_results.head(15))
+# print(best_results.head(15))
 
 
 # df = df.sort_values(by='Points')
