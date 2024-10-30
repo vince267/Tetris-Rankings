@@ -51,7 +51,7 @@ def modify_event(row):
     return row['Event']
 
 def das_points(row):
-    sixteen_bracket_events = ['CTM DAS Masters', 'CTM DAS Super Circuit', 'CTM Lone Star DAS']
+    sixteen_bracket_events = ['CTM DAS Masters', 'CTM DAS World Circuit', 'CTM DAS Major Circuit', 'CTM DAS Super Circuit', 'CTM Lone Star DAS']
 
     event_stage_points = {
         'Jonas Cup': {
@@ -127,13 +127,29 @@ def points_agg(points, event):
             7: 1000,
             8: 1600
             },
-        'CTM DAS Super Circuit': {
+        'CTM DAS World Circuit': {
+            0: 0,
+            1: 50,
+            3: 10,
+            5: 200,
+            7: 400,
+            8: 800
+        },
+        'CTM DAS Major Circuit': {
             0: 0,
             1: 25,
             3: 50,
             5: 100,
             7: 200,
             8: 400
+        },
+        'CTM DAS Super Circuit': {
+            0: 0,
+            1: 10,
+            3: 20,
+            5: 40,
+            7: 100,
+            8: 200
         },
         'CTM Lone Star DAS': {
             0: 0,
@@ -248,7 +264,15 @@ players_df['Total_Points'] = players_df['Total_Points'].astype(int)
 players_df = players_df.sort_values(by='Total_Points', ascending=False).reset_index(drop=True)
 players_df.index += 1
 
-print(players_df.head(20))
+# print(players_df.head(20))
+
+player = "SHARKY"
+best_results = event_results_df.loc[event_results_df['Player'] == player]
+best_results = best_results.sort_values(by='Event_Points', ascending=False)
+
+print(best_results.head(15))
+
+
 # df = df.sort_values(by='Points')
 # print(df.tail(100))
 

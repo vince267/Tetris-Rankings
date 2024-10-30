@@ -175,10 +175,18 @@ pd.set_option('display.max_rows', None)
 
 print(players_df.head(num_top_players))
 
+
+player = "SHARKY"
+best_results = event_results_df.loc[event_results_df['Player'] == player]
+best_results = best_results.sort_values(by='Event_Points', ascending=False)
+
+# Uncomment to print best results for given player
+# print(best_results.head(15))
+
+
+# Uncomment for sql style queries
 # execute = lambda q: sqldf(q, globals())
 # query = "SELECT DISTINCT(Event) FROM df ORDER BY Event"
 # query_df = execute(query)
 # print(query_df)
-
-# print(df.head())
 
