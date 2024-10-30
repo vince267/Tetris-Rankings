@@ -51,7 +51,7 @@ def modify_event(row):
     return row['Event']
 
 def das_points(row):
-    sixteen_bracket_events = ['CTM DAS Masters', 'CTM DAS Super Circuit', 'CTM Lone Star DAS', 'Lone Star Das', 'CT Das Minor']
+    sixteen_bracket_events = ['CTM DAS Masters', 'CTM DAS Super Circuit', 'CTM Lone Star DAS']
 
     event_stage_points = {
         'Jonas Cup': {
@@ -86,9 +86,12 @@ def das_points(row):
             'Losers Round 1': 75,
             'Losers Round 0': 50
         }
-        # },
-        # 'CTM Lone Star Das': {
-        #     'Finals': 0
+        },
+        'Lone Star Das': {
+            'Final': {'Win': 1000, 'Lose': 600},
+            'Semi-final': 300,
+            'Quarter-final': 100,
+            'Round 1': 50,
         }
     }
 
@@ -115,16 +118,14 @@ def das_points(row):
 
 def points_agg(points, event):
     # CT DAS Minor is also a 16 person bracket, but has bo3(bo3) format until bo5(bo3) in the finals 
-    sixteen_bracket_events = ['CTM DAS Masters', 'CTM DAS Super Circuit', 'CTM Lone Star DAS', 'Lone Star Das']
-
     sixteen_bracket_points = {
         'CTM DAS Masters': {
             0: 0,
             1: 100,
-            3: 200,
-            5: 400,
-            7: 800,
-            8: 1200
+            3: 300,
+            5: 600,
+            7: 1000,
+            8: 1600
             },
         'CTM DAS Super Circuit': {
             0: 0,
@@ -136,20 +137,12 @@ def points_agg(points, event):
         },
         'CTM Lone Star DAS': {
             0: 0,
-            1: 10,
-            3: 20,
-            5: 30,
-            7: 50,
-            8: 100
-        },
-        'Lone Star Das': {
-            0: 0,
-            1: 5,
-            3: 10,
-            5: 15,
-            7: 30, 
-            8: 50
-        }   
+            1: 100,
+            3: 300,
+            5: 600,
+            7: 1000,
+            8: 1600
+        }
     }
 
 
@@ -157,7 +150,7 @@ def points_agg(points, event):
     event_name = event.iloc[0]
     if event_name in sixteen_bracket_points:
         total_points = points.sum()
-        return sixteen_bracket_points.get(total_points, 0)
+        return sixteen_bracket_points[event_name].get(total_points, 0)
     else:
         return points.max()
 
@@ -221,8 +214,9 @@ df['Stage'] = df.apply(get_stage, axis=1)
 df['Edition'] = df.apply(get_edition, axis=1)
 
 # For events with the edition in the event name, move the edition to the edition column
-df['Edition'] = df.apply(split_edition, axis=1)
-df['Event'] = df.apply(modify_event, axis=1)
+df['Edition'] = df.apply(split_edition, axis=1).fillna('NA')
+df['Event'] = df.apply(modify_event, axis=1).fillna('NA')
+
 
 # Reorder columns, drop Info column
 df = df[['Player', 'Event', 'Edition', 'Stage', 'Outcome', 'Date', 'Time']]
@@ -254,8 +248,12 @@ players_df['Total_Points'] = players_df['Total_Points'].astype(int)
 players_df = players_df.sort_values(by='Total_Points', ascending=False).reset_index(drop=True)
 players_df.index += 1
 
-# print(players_df.tail())
+print(players_df.head(20))
+# df = df.sort_values(by='Points')
+# print(df.tail(100))
 
+# print(event_results_df.loc[event_results_df['Player'] == 'SHARKY'])
+# print(df.loc[df['Player'] == 'SHARKY'])
 
 # df = df.sort_values(by='Event')
 # print(df.tail())
