@@ -91,6 +91,7 @@ ct_das_df = ct_das_df.drop_duplicates(['Winner', 'Loser', 'Event', 'Info'], keep
 switch = ct_das_df['Wins'] < ct_das_df['Losses']
 ct_das_df.loc[switch, ['Winner', 'Wins', 'Losses', 'Loser']] = ct_das_df.loc[switch, ['Loser', 'Losses', 'Wins', 'Winner']].values
 
+
 ct_das_winners = ct_das_df[['Winner', 'Event', 'Info', 'Date']].rename(columns={'Winner': 'Player'})
 ct_das_winners['Outcome'] = 'Win'
 ct_das_losers = ct_das_df[['Loser', 'Event', 'Info', 'Date']].rename(columns={'Loser': 'Player'})
@@ -99,6 +100,11 @@ ct_das_df = pd.concat([ct_das_winners, ct_das_losers])
 
 ct_das_df['Points'] = 0
 ct_das_df['Points'] = ct_das_df.apply(ctdas_points, axis=1)
+
+ct_das_df = ct_das_df.reset_index(drop=True)
+
+# Give Andy extra points since his opponent was DQ'd and his win wasn't recorded
+ct_das_df.loc[278, 'Points'] = 3
 
 # Split Info column into an edition column and a stage column. Original Info column was not consistent. 
 ct_das_df['Stage'] = ct_das_df.apply(get_stage, axis=1)
@@ -110,10 +116,6 @@ ct_das_df['Event'] = ct_das_df.apply(modify_event, axis=1).fillna('NA')
 
 ct_das_df = ct_das_df[['Player', 'Event', 'Edition', 'Stage', 'Date', 'Outcome', 'Points']]
 
-print(ct_das_df.loc[ct_das_df['Event'] == 'CT DAS'])
-
-
-# print(ct_das_df.loc[ct_das_df['Event'] == 'CT DAS'])
 
 # Drop duplicate rows
 df = df.drop_duplicates(['Winner', 'Wins', 'Losses', 'Loser', 'Event', 'Edition', 'Stage', 'Date'])
@@ -143,7 +145,7 @@ players_df = players_df[['Player', 'Wins', 'Losses']]
 df = df.drop(df[df['Event'].str.contains('CT DAS')].index)
 
 
-# Make an event results dataframe
+# Make event results dataframes
 # Columns: Player, Event, Edition, Type, Result
 
 event_results_df = df.groupby(['Player', 'Event', 'Edition'], as_index=False).agg(
@@ -154,8 +156,10 @@ ctdas_results_df = ct_das_df.groupby(['Player', 'Event', 'Edition'], as_index=Fa
     Event_Points = ('Points', lambda points: ctdas_points_agg(points, ct_das_df.loc[points.index, 'Edition']))
 )
 
-ctdas_results_df = ctdas_results_df.sort_values(by='Event_Points')
-# print(ctdas_results_df.tail(100))
+# Combine event results
+event_results_df = pd.concat([event_results_df, ctdas_results_df], axis=0)
+event_results_df = event_results_df.sort_values(by='Event_Points')
+print(event_results_df.tail(50))
 
 # Add Total Points column to dataframe
 player_points = event_results_df.groupby('Player')['Event_Points'].agg(top_performances, num_performances)
@@ -167,27 +171,15 @@ players_df.index += 1
 
 # print(players_df.head(20))
 
-player = "ROBIN"
+player = "NGC MAN"
 best_results = event_results_df.loc[event_results_df['Player'] == player]
 best_results = best_results.sort_values(by='Event_Points', ascending=False)
-
 # print(best_results.head(15))
 
 
-# df = df.sort_values(by='Points')
-# print(df.tail(100))
 
-# print(event_results_df.loc[event_results_df['Player'] == 'SHARKY'])
-# print(df.loc[df['Player'] == 'SHARKY'])
 
-# df = df.sort_values(by='Event')
-# print(df.tail())
-# for x in (sorted(df['Event'].unique())):
-#     print(x)
 
-# print(ct_das_df.loc[(ct_das_df['Event'] == 'CT DAS Minor'), ['Edition', 'Stage']])
-
-# print(df.loc[(df['Event'] == 'CTM Lone Star DAS'), ['Edition', 'Stage']])
 
 
 # execute = lambda q: sqldf(q, globals())
