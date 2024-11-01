@@ -6,17 +6,27 @@ from helpers import get_stage, get_edition, get_result, split_edition, modify_ev
 pd.set_option('display.max_rows', None)
 
 # Filter data for only the prior n years
-num_years = 5
+num_years = 3
 
 # Count the top n performances in the given timeframe
-num_performances = 10
+num_performances = 6
 
 # Print top n players
 num_top_players = 20
 
 # Decide whether to drop friendlies or include them
 drop_friendlies = True
-    
+
+# Modify player name to access summary of other players.
+player = 'pixelandy'
+
+# To print top overall results (eg top 10 ranked players), set to True
+print_top_ovr_results = True
+
+# To print a summary of an individual player's ranking and best results, set to True.
+print_player_info = True
+
+
 
 
 # Google sheets CSV export URL format
@@ -172,14 +182,30 @@ players_df['Total_Points'] = players_df['Total_Points'].astype(int)
 players_df = players_df.sort_values(by='Total_Points', ascending=False).reset_index(drop=True)
 players_df.index += 1
 
-# print(players_df.head(20))
+# Print top overall results
+if print_top_ovr_results:
+    print(players_df.head(num_top_players))
 
-player = "SHARKY"
-best_results = event_results_df.loc[event_results_df['Player'] == player]
-best_results = best_results.sort_values(by='Event_Points', ascending=False)
-best_results = best_results.drop(best_results.loc[best_results['Event_Points'] == 0].index)
-print(best_results.head(15))
+# Capitalize player name
+player = player.upper()
 
+# Print summary of player's info and best results. 
+if not print_player_info:
+    pass
+elif player in event_results_df['Player'].values:
+    best_results = event_results_df.loc[event_results_df['Player'] == player]
+    best_results = best_results[['Event', 'Edition', 'Event_Points', 'Event_Result']].sort_values(by='Event_Points', ascending=False)
+    best_results = best_results.drop(best_results.loc[best_results['Event_Points'] == 0].index).reset_index(drop=True)
+    best_results.index += 1
+
+    wins = players_df.loc[players_df['Player'] == player, 'Wins'].values[0]
+    losses = players_df.loc[players_df['Player'] == player, 'Losses'].values[0]
+
+    print(player, ': Ranked number ', players_df.loc[players_df['Player'] == player].index.to_list()[0], ' overall. ', sep='')
+    print('Win-loss record: ', wins, '-', losses, '\nTop results:', sep='')
+    print(best_results.head(15))
+else: 
+    print('Player name not found in database. \nMake sure name is spelled correctly.')
 
 
 

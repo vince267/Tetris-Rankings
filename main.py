@@ -12,9 +12,19 @@ num_performances = 10
 # Print top n players
 num_top_players = 20
 
-# Filter data for events of type Elo, Das, or Friendly.
+# Filter data for events of type Elo or Friendly. Friendly only gives win loss records. 
+# Set match type to 'ANY' (or any string other than ELO or FRIENDLY) to include friendlies in win-loss record.
 match_type = 'ELO'
-possible_types = ['ELO', 'DAS', 'FRIENDLY']
+possible_types = ['ELO', 'FRIENDLY']
+
+# Modify player name to access summary of other players.
+player = 'fractal'
+
+# To print top overall results (eg top 10 ranked players), set to True
+print_top_ovr_results = True
+
+# To print a summary of an individual player's ranking and best results, set to True.
+print_player_info = True
 
 
 def elo_points(row):
@@ -177,16 +187,31 @@ players_df.index += 1
 
 pd.set_option('display.max_rows', None)
 
-# print(players_df.head(num_top_players))
+# Print top overall results
+if print_top_ovr_results:
+    print(players_df.head(num_top_players))
 
+# Capitalize player name
+player = player.upper()
 
-player = "SHARKY"
-best_results = event_results_df.loc[event_results_df['Player'] == player]
-best_results = best_results.sort_values(by='Event_Points', ascending=False)
-best_results = best_results.drop(best_results.loc[best_results['Event_Points'] == 0].index)
+# Print summary of player's info and best results. 
+if not print_player_info:
+    pass
+elif player in event_results_df['Player'].values:
+    best_results = event_results_df.loc[event_results_df['Player'] == player]
+    best_results = best_results[['Event', 'Edition', 'Event_Points', 'Event_Result']].sort_values(by='Event_Points', ascending=False)
+    best_results = best_results.drop(best_results.loc[best_results['Event_Points'] == 0].index).reset_index(drop=True)
+    best_results.index += 1
 
-# Uncomment to print best results for given player
-print(best_results.head(15))
+    wins = players_df.loc[players_df['Player'] == player, 'Wins'].values[0]
+    losses = players_df.loc[players_df['Player'] == player, 'Losses'].values[0]
+
+    print(player, ': Ranked number ', players_df.loc[players_df['Player'] == player].index.to_list()[0], ' overall. ', sep='')
+    print('Win-loss record: ', wins, '-', losses, '\nTop results:', sep='')
+    print(best_results.head(15))
+else: 
+    print('Player name not found in database. \nMake sure name is spelled correctly.')
+
 
 
 # Uncomment for sql style queries
