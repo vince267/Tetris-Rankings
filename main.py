@@ -59,11 +59,13 @@ time_frame = datetime.now() - timedelta(days= num_years * 365 + 1)
 df = df[df['Date'] >= time_frame]
 
 # Reshape dataframe 
-winners_df = df[['Match', 'Winner', 'Event', 'Edition', 'Date', 'Stage', 'Location', 'Type']].rename(columns={'Winner': 'Player'})
+winners_df = df[['Winner', 'Event', 'Edition', 'Stage', 'Date']].rename(columns={'Winner': 'Player'})
 winners_df['Outcome'] = 'Win'
-losers_df = df[['Match', 'Loser', 'Event', 'Edition', 'Date', 'Stage', 'Location', 'Type']].rename(columns={'Loser': 'Player'})
+losers_df = df[['Loser', 'Event', 'Edition', 'Stage', 'Date']].rename(columns={'Loser': 'Player'})
 losers_df['Outcome'] = 'Lose'
 df = pd.concat([winners_df, losers_df])
+
+
 
 # Enter initial point values for each match at notable events
 df['Points'] = 0
