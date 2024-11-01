@@ -1,7 +1,7 @@
 import pandas as pd
 from datetime import datetime, timedelta
 from pandasql import sqldf
-from helpers import get_stage, get_edition, split_edition, modify_event, das_points, ctdas_points, points_agg, ctdas_points_agg, top_performances # type: ignore
+from helpers import get_stage, get_edition, get_result, split_edition, modify_event, das_points, ctdas_points, points_agg, ctdas_points_agg, top_performances # type: ignore
 
 pd.set_option('display.max_rows', None)
 
@@ -159,7 +159,10 @@ ctdas_results_df = ct_das_df.groupby(['Player', 'Event', 'Edition'], as_index=Fa
 # Combine event results
 event_results_df = pd.concat([event_results_df, ctdas_results_df], axis=0)
 event_results_df = event_results_df.sort_values(by='Event_Points')
-print(event_results_df.tail(50))
+
+# Add an Event Result column. 
+event_results_df['Event_Result'] = event_results_df.apply(get_result, axis=1)
+
 
 # Add Total Points column to dataframe
 player_points = event_results_df.groupby('Player')['Event_Points'].agg(top_performances, num_performances)
@@ -171,10 +174,11 @@ players_df.index += 1
 
 # print(players_df.head(20))
 
-player = "NGC MAN"
+player = "SHARKY"
 best_results = event_results_df.loc[event_results_df['Player'] == player]
 best_results = best_results.sort_values(by='Event_Points', ascending=False)
-# print(best_results.head(15))
+best_results = best_results.drop(best_results.loc[best_results['Event_Points'] == 0].index)
+print(best_results.head(15))
 
 
 

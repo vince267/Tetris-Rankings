@@ -1,7 +1,7 @@
 import pandas as pd
 from pandasql import sqldf
 from datetime import datetime, timedelta
-from helpers import elo_points, points_agg, top_performances
+from helpers import elo_points, points_agg, get_result, top_performances
 
 # Filter data for only the prior n years
 num_years = 2 
@@ -150,11 +150,14 @@ df['Points'] = df.apply(elo_points, axis=1)
 
 
 # Make an event results dataframe
-# Columns: Player, Event, Edition, Type, Result
+# Columns: Player, Event, Edition, Type, Event Points, Event Result (eg. 'Top 8')
 
 event_results_df = df.groupby(['Player', 'Event', 'Edition'], as_index=False).agg(
     Event_Points = ('Points', lambda points: points_agg(points, df.loc[points.index, 'Event']))
 )
+# Add an Event Result column. 
+event_results_df['Event_Result'] = event_results_df.apply(get_result, axis=1)
+
 
 # Create players dataframe
 # Columns: Player, Wins, Losses, Total Points (to come later)
@@ -174,15 +177,16 @@ players_df.index += 1
 
 pd.set_option('display.max_rows', None)
 
-print(players_df.head(num_top_players))
+# print(players_df.head(num_top_players))
 
 
 player = "SHARKY"
 best_results = event_results_df.loc[event_results_df['Player'] == player]
 best_results = best_results.sort_values(by='Event_Points', ascending=False)
+best_results = best_results.drop(best_results.loc[best_results['Event_Points'] == 0].index)
 
 # Uncomment to print best results for given player
-# print(best_results.head(15))
+print(best_results.head(15))
 
 
 # Uncomment for sql style queries
