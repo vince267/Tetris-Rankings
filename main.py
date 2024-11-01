@@ -4,13 +4,13 @@ from datetime import datetime, timedelta
 from helpers import elo_points, points_agg, get_result, top_performances
 
 # Filter data for only the prior n years
-num_years = 2 
+num_years = 1
 
 # Count the top n performances in the given timeframe
-num_performances = 10
+num_performances = 3
 
 # Print top n players
-num_top_players = 20
+num_top_players = 10
 
 # Filter data for events of type Elo or Friendly. Friendly only gives win loss records. 
 # Set match type to 'ANY' (or any string other than ELO or FRIENDLY) to include friendlies in win-loss record.
@@ -18,7 +18,7 @@ match_type = 'ELO'
 possible_types = ['ELO', 'FRIENDLY']
 
 # Modify player name to access summary of other players.
-player = 'fractal'
+player = 'vance'
 
 # To print top overall results (eg top 10 ranked players), set to True
 print_top_ovr_results = True

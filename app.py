@@ -30,10 +30,10 @@ print_top_ovr_results = True
 # To print a summary of an individual player's ranking and best results, set to True.
 print_player_info = True
 
-if match_type == 'DAS': 
+if match_type == 'ELO': 
     # Google Sheets CSV export URL format
-    sheet_id = "1nEN0MAbueG36UDkpfUsPZEmAMuKif6IcLAmJ8iZhCe8"
-    gid = "805197322"
+    sheet_id = "1Rw1XT90YD8HvYN4JS0Ba1tgkp7UlrG4ksPuP4Yc4SNM"
+    gid = "658545272"
     url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv&gid={gid}"
 
     # Read the data into a DataFrame
@@ -44,15 +44,15 @@ if match_type == 'DAS':
     df = df.rename(columns={'Result': 'Winner', 'Unnamed: 2': 'Wins', 'Unnamed: 3': 'Losses', 'Unnamed: 4': 'Loser', 'Date/time': 'Date', 'Round/game': 'Stage', 'Restreamer/location': 'Location'})
     df.drop(['Unnamed: 5'], axis = 1, inplace = True) 
 
-    # Drop friendly events
+    # Drop friendly events/matches
     if drop_friendlies:
-        drop_list = ['Friendlies', 'Friendlies: Retribution', 'Friendlies: Rivals', 'LATAM Friendlies', 'LYMYMI Tournament', 'Tetris Friendlies', 'TNP']
-        df = df[~df['Event'].isin(drop_list)]
+        df = df[df['Type'] == match_type]
 
-if match_type == 'ELO':
+if match_type == 'DAS':
     # Google Sheets CSV export URL format
-    sheet_id = "1Rw1XT90YD8HvYN4JS0Ba1tgkp7UlrG4ksPuP4Yc4SNM"
-    gid = "658545272"
+    sheet_id = "1nEN0MAbueG36UDkpfUsPZEmAMuKif6IcLAmJ8iZhCe8"
+    gid = "805197322"
+
     url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv&gid={gid}"
 
     # Read specified columns into a dataframe
@@ -74,9 +74,10 @@ if match_type == 'ELO':
     df['Info'] = df['Info'].str.replace('Final', 'Finals')
     df['Info'] = df['Info'].str.replace('Finalss', 'Finals')
 
-    # Drop friendly events/matches
+    # Drop friendly events
     if drop_friendlies:
-        df = df[df['Type'] == match_type]
+        drop_list = ['Friendlies', 'Friendlies: Retribution', 'Friendlies: Rivals', 'LATAM Friendlies', 'LYMYMI Tournament', 'Tetris Friendlies', 'TNP']
+        df = df[~df['Event'].isin(drop_list)]
 
 
 # Move the winners to column 1

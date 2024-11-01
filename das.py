@@ -6,13 +6,13 @@ from helpers import get_stage, get_edition, get_result, split_edition, modify_ev
 pd.set_option('display.max_rows', None)
 
 # Filter data for only the prior n years
-num_years = 3
+num_years = 1
 
 # Count the top n performances in the given timeframe
-num_performances = 6
+num_performances = 3
 
 # Print top n players
-num_top_players = 20
+num_top_players = 10
 
 # Decide whether to drop friendlies or include them
 drop_friendlies = True
