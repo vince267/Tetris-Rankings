@@ -1,0 +1,44 @@
+# Byte-compiled files
+__pycache__/
+*.py[cod]
+*.pyc
+
+# Environment variables
+.env
+*.env
+
+# Jupyter Notebooks checkpoints
+.ipynb_checkpoints
+
+# macOS specific
+.DS_Store
+
+# VS Code settings
+.vscode/
+
+# Python virtual environment folders
+venv/
+env/
+.idea/
+
+# Cache files
+*.log
+*.pot
+*.pyc
+*.pyo
+*.pyd
+
+# Flask specific
+instance/
+*.sqlite3
+*.db
+
+# Configuration
+config.py
+
+# Ignoring the data file or database, if applicable
+*.db
+*.csv
+
+# Pytest cache
+.pytest_cache/

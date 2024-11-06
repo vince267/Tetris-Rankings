@@ -1,3 +1,4 @@
+import numpy as np
 def elo_points(row):
     ctm_events = ['CTM Masters', 'CTM Challengers', 'CTM Futures', 'CTM Hopefuls']
 
@@ -121,16 +122,16 @@ def get_edition(row):
     return row.get('Edition')
 
 def split_edition(row):
-    if '20' in row['Event']:
-        event = row['Event'].split()
-        n = len(event)
+    event = row.get('Event')
+    if isinstance(event, str) and '20' in event:
+        event = event.split()
         return event[-1]
-    return row['Edition']
+    return row.get('Edition')
 
 def modify_event(row):
-    if '20' in row['Event']:
-        event = row['Event'].split()
-        n = len(event)
+    event = row.get('Event')
+    if isinstance(event, str) and '20' in event:
+        event = event.split()
         return " ".join(event[:-1])
     return row['Event']
 

@@ -39,6 +39,9 @@ url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv&gid=
 cols = range(1,9)
 df = pd.read_csv(url, usecols=cols)
 
+dasplayers = pd.concat([df['Player1'], df['Player2']]).unique()
+dasplayers = sorted(dasplayers)
+print('Number of players in dasplayers:', len(dasplayers))
 # Drop blank column and rename columns
 df = df.drop(['Unnamed: 5'], axis=1)
 df = df.rename(columns={'Player1': 'Winner', 'Unnamed: 2': 'Wins', 'Unnamed: 3': 'Losses', 'Player2': 'Loser', 'Edition/Round': 'Info', 'Date/Time (UTC)': 'Date'})
@@ -143,7 +146,6 @@ df = pd.concat([winners_df, losers_df])
 df['Points'] = 0
 df['Points'] = df.apply(das_points, axis=1)
 
-
 # Create players dataframe
 # Columns: Player, Wins, Losses, Total_Points (to come later)
 players_df = df.groupby(['Player', 'Outcome']).size().unstack(fill_value=0)
@@ -172,7 +174,6 @@ event_results_df = event_results_df.sort_values(by='Event_Points')
 
 # Add an Event Result column. 
 event_results_df['Event_Result'] = event_results_df.apply(get_result, axis=1)
-
 
 # Add Total Points column to dataframe
 player_points = event_results_df.groupby('Player')['Event_Points'].agg(top_performances, num_performances)

@@ -120,8 +120,9 @@ elif player in event_results_df['Player'].values:
 
     wins = players_df.loc[players_df['Player'] == player, 'Wins'].values[0]
     losses = players_df.loc[players_df['Player'] == player, 'Losses'].values[0]
+    ranking = players_df.loc[players_df['Player'] == player].index.to_list()[0]
 
-    print(player, ': Ranked number ', players_df.loc[players_df['Player'] == player].index.to_list()[0], ' overall. ', sep='')
+    print(player, ': Ranked number ', ranking, ' overall. ', sep='')
     print('Win-loss record: ', wins, '-', losses, '\nTop results:', sep='')
     print(best_results.head(15))
 else: 
