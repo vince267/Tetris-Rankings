@@ -8,8 +8,9 @@ Player Info
 <h1>DAS Player Info</h1>
 
 <p>
-    These rankings by default count the top 10 results for players over the past 2 years. You may adjust these defaults, as well as how many players are displayed, with the forms below. 
+    Choose a player to display a summary of their best results in DAS only tournaments. The ranking compares the player's performances in the given time frame to other DAS players in the same time frame. These rankings by default count the top 6 DAS results for players over the past 2 years. You may adjust these defaults with the forms below. 
 </p>
+
 <h2>Select Display Options</h2>
 <form action="/dasplayerinfo" method="POST">
     <label for="player">Player name</label>
@@ -30,6 +31,10 @@ Player Info
 
     <input type="submit" value="Submit">
 </form>
+
+<p>
+    The summary below displays the top {{ num_performances }} performances for {{ player }} over the past {{ num_years }} years. 
+</p>
 
 <h2>Player Summary for {{ player }}</h2>
 <p>Ranked {{ ranking }} overall. </p>

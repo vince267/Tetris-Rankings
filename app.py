@@ -149,7 +149,7 @@ def rankings():
     
 
 
-    return render_template('index.html', data=data)
+    return render_template('index.html', data=data, num_years=num_years, num_performances=num_performances, num_top_players=num_top_players)
 
 
 @app.route("/dasrankings", methods=['GET', 'POST'])
@@ -158,13 +158,13 @@ def dasrankings():
     num_years = int(request.form.get('num_years', 2))
 
     # Count the top n performances in the given timeframe
-    num_performances = int(request.form.get('num_top_performances', 10))
+    num_performances = int(request.form.get('num_top_performances', 6))
 
     # Print top n players
     num_top_players = int(request.form.get('num_players', 15))
 
-    # Decide whether to drop friendlies or include them
-    drop_friendlies = True
+    # # Decide whether to drop friendlies or include them
+    # drop_friendlies = True
 
 
 
@@ -322,7 +322,7 @@ def dasrankings():
     # Convert to dictionary to read into html file
     data = players_df.to_dict(orient='records')
 
-    return render_template('dasrankings.html', data=data)
+    return render_template('dasrankings.html', data=data, num_years=num_years, num_performances=num_performances, num_top_players=num_top_players)
 
 
 @app.route("/playerinfo", methods=['GET', 'POST'])
@@ -395,7 +395,7 @@ def playerinfo():
         wins = 0
         losses = 0
 
-    return render_template("playerinfo.html", data=data, player=player, ranking=ranking, wins=wins, losses=losses, eloplayers=eloplayers)
+    return render_template("playerinfo.html", data=data, player=player, ranking=ranking, wins=wins, losses=losses, eloplayers=eloplayers, num_years=num_years, num_performances=num_performances)
 
 
 @app.route("/dasplayerinfo", methods=['GET', 'POST'])
@@ -404,7 +404,7 @@ def dasplayerinfo():
     num_years = int(request.form.get('num_years', 2))
 
     # Count the top n performances in the given timeframe
-    num_performances = int(request.form.get('num_top_performances', 10))
+    num_performances = int(request.form.get('num_top_performances', 6))
 
     player = request.form.get('player', 'FRACTAL')
     player = player.upper()
@@ -595,7 +595,7 @@ def dasplayerinfo():
 
 
     # Redirect user to login form
-    return render_template("dasplayerinfo.html", data=data, player=player, ranking=ranking, wins=wins, losses=losses, dasplayers=dasplayers)
+    return render_template("dasplayerinfo.html", data=data, player=player, ranking=ranking, wins=wins, losses=losses, dasplayers=dasplayers, num_years=num_years, num_performances=num_performances)
 
 
 if __name__ == '__main__':

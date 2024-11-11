@@ -11,7 +11,7 @@ Player Search
     This merit based ranking assigns each player a certain amount of points according to how far they got in each DAS only tournament they participated in. Success across different events may result in different amounts of points awarded, depending on how large the event, the quality of competition, and the prestige and prize pool behind the event. 
 </p>
 <p>
-    These rankings by default count the top 10 results for players over the past 2 years. You may adjust these defaults, as well as how many players are displayed, with the forms below. 
+    These rankings by default count the top 6 results for players over the past 2 years. You may adjust these defaults, as well as how many players are displayed, with the forms below. 
 </p>
 <h2>Select Display Options</h2>
 <form action="/" method="POST">
@@ -27,6 +27,9 @@ Player Search
     <input type="submit" value="Submit">
 </form>
 
+<p>
+    The rankings below display the top {{ num_players }} ranked DAS players, ranked by their top {{ num_performances }} performances over the past {{ num_years }} years. 
+</p>
 
     <div>
         <h2>Player Rankings</h2>
