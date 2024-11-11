@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from helpers import elo_points, points_agg, get_result, top_performances
 
 # Filter data for only the prior n years
-num_years = 1
+num_years = 12
 
 # Count the top n performances in the given timeframe
 num_performances = 3
@@ -18,7 +18,7 @@ match_type = 'ELO'
 possible_types = ['ELO', 'FRIENDLY']
 
 # Modify player name to access summary of other players.
-player = 'vance'
+player = '8888Q'
 
 # To print top overall results (eg top 10 ranked players), set to True
 print_top_ovr_results = True

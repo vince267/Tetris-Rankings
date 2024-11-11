@@ -21,8 +21,30 @@ ovr_df = pd.read_csv(url, usecols=cols)
 ovr_df = ovr_df.rename(columns={'Result': 'Winner', 'Unnamed: 2': 'Wins', 'Unnamed: 3': 'Losses', 'Unnamed: 4': 'Loser', 'Date/time': 'Date', 'Round/game': 'Stage', 'Restreamer/location': 'Location'})
 ovr_df.drop(['Unnamed: 5'], axis = 1, inplace = True) 
 
+# Convert dates to datetime
+ovr_df['Date'] = pd.to_datetime(ovr_df['Date'], format='%d/%m/%Y %H:%M:%S')
+
+# Some rows have wins < losses. Normalize rows so that the winner is always on the left.
+switch = ovr_df['Wins'] < ovr_df['Losses']
+ovr_df.loc[switch, ['Winner', 'Loser', 'Wins', 'Losses']] = ovr_df.loc[switch, ['Loser', 'Winner', 'Losses', 'Wins']].values 
+
+# Reshape dataframe 
+winners_df = ovr_df[['Winner', 'Event', 'Edition', 'Stage', 'Date', 'Type']].rename(columns={'Winner': 'Player'})
+winners_df['Outcome'] = 'Win'
+losers_df = ovr_df[['Loser', 'Event', 'Edition', 'Stage', 'Date', 'Type']].rename(columns={'Loser': 'Player'})
+losers_df['Outcome'] = 'Lose'
+ovr_df = pd.concat([winners_df, losers_df])
+
+# Only keep ELO matches 
+ovr_df = ovr_df[ovr_df['Type'] == 'ELO']
+
+
+
+
+
 # Get list of players from main dataframe
-eloplayers = pd.concat([ovr_df['Winner'], ovr_df['Loser']]).unique()
+# eloplayers = pd.concat([ovr_df['Winner'], ovr_df['Loser']]).unique()
+eloplayers = ovr_df['Player'].unique()
 eloplayers = sorted(eloplayers)
 
 
@@ -39,9 +61,42 @@ dasplayers = pd.concat([das_df['Player1'], das_df['Player2']]).unique()
 dasplayers = sorted(dasplayers)
 
 
+# Drop blank column and rename columns
+das_df = das_df.drop(['Unnamed: 5'], axis=1)
+das_df = das_df.rename(columns={'Player1': 'Winner', 'Unnamed: 2': 'Wins', 'Unnamed: 3': 'Losses', 'Player2': 'Loser', 'Edition/Round': 'Info', 'Date/Time (UTC)': 'Date'})
+
+
+# Fill null event entries
+das_df['Event'] = das_df['Event'].fillna("NA")
+
+# Normalize spellings
+das_df['Event'] = das_df['Event'].str.replace('Das', 'DAS')
+for x in ['-final', '-Final', '-finals', '-Finals']:
+    das_df['Info'] = das_df['Info'].str.replace(x, 'finals')
+das_df['Info'] = das_df['Info'].str.replace('Final', 'Finals')
+das_df['Info'] = das_df['Info'].str.replace('Finalss', 'Finals')
+
+# # Drop friendly events
+# if drop_friendlies:
+drop_list = ['Friendlies', 'Friendlies: Retribution', 'Friendlies: Rivals', 'LATAM Friendlies', 'LYMYMI Tournament', 'Tetris Friendlies', 'TNP']
+das_df = das_df[~das_df['Event'].isin(drop_list)]
+
+
+# Move the winners to column 1
+switch = das_df['Wins'] < das_df['Losses']
+das_df.loc[switch, ['Winner', 'Wins', 'Losses', 'Loser']] = das_df.loc[switch, ['Loser', 'Losses', 'Wins', 'Winner']].values
+
+# Convert dates to datetime format
+das_df['Date'] = pd.to_datetime(das_df['Date'], format='%d/%m/%Y %H:%M:%S')
+
+# Replace null values for Event column
+das_df['Event'] = das_df['Event'].fillna('None')
+
+
+
 
 @app.route('/', methods=['GET', 'POST'])
-def home():
+def rankings():
     # Filter data for only the prior n years
     num_years = int(request.form.get('num_years', 2))
 
@@ -51,49 +106,12 @@ def home():
     # Print top n players
     num_top_players = int(request.form.get('num_players', 15))
 
-
-    # Filter data for events of type Elo or Friendly. Friendly only gives win loss records. 
-    # Set match type to 'ANY' (or any string other than ELO or FRIENDLY) to include friendlies in win-loss record.
-    match_type = 'ELO'
-    possible_types = ['ELO', 'FRIENDLY']
-
-    # Google Sheets CSV export URL format
-    # sheet_id = "1Rw1XT90YD8HvYN4JS0Ba1tgkp7UlrG4ksPuP4Yc4SNM"
-    # gid = "658545272"
-
-    # url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv&gid={gid}"
-
-    # # Read the data into a DataFrame
-    # cols = range(0,12)
-    # df = pd.read_csv(url, usecols=cols)
-
-    # # Rename columns and drop space buffer column.
-    # df = df.rename(columns={'Result': 'Winner', 'Unnamed: 2': 'Wins', 'Unnamed: 3': 'Losses', 'Unnamed: 4': 'Loser', 'Date/time': 'Date', 'Round/game': 'Stage', 'Restreamer/location': 'Location'})
-    # df.drop(['Unnamed: 5'], axis = 1, inplace = True) 
-
+    # Make a deep copy of the dataframe
     df = ovr_df.copy(deep=True)
-
-    # Filter dataframe to only of specified match type
-    if match_type in possible_types:
-        df = df[df['Type'] == match_type]
-
-    # Some rows have wins < losses. Normalize rows so that the winner is always on the left.
-    switch = df['Wins'] < df['Losses']
-    df.loc[switch, ['Winner', 'Loser', 'Wins', 'Losses']] = df.loc[switch, ['Loser', 'Winner', 'Losses', 'Wins']].values 
-
-    # Convert dates to datetime
-    df['Date'] = pd.to_datetime(df['Date'], format='%d/%m/%Y %H:%M:%S')
 
     # Filter rows with dates within the last n years
     time_frame = datetime.now() - timedelta(days= num_years * 365 + 1)
     df = df[df['Date'] >= time_frame]
-
-    # Reshape dataframe 
-    winners_df = df[['Winner', 'Event', 'Edition', 'Stage', 'Date']].rename(columns={'Winner': 'Player'})
-    winners_df['Outcome'] = 'Win'
-    losers_df = df[['Loser', 'Event', 'Edition', 'Stage', 'Date']].rename(columns={'Loser': 'Player'})
-    losers_df['Outcome'] = 'Lose'
-    df = pd.concat([winners_df, losers_df])
 
     # Enter initial point values for each match at notable events
     df['Points'] = 0
@@ -101,7 +119,6 @@ def home():
 
     # Make an event results dataframe
     # Columns: Player, Event, Edition, Type, Event Points, Event Result (eg. 'Top 8')
-
     event_results_df = df.groupby(['Player', 'Event', 'Edition'], as_index=False).agg(
         Event_Points = ('Points', lambda points: points_agg(points, df.loc[points.index, 'Event']))
     )
@@ -153,48 +170,39 @@ def dasrankings():
 
 
 
-    # Google sheets CSV export URL format
-    # sheet_id = "1nEN0MAbueG36UDkpfUsPZEmAMuKif6IcLAmJ8iZhCe8"
-    # gid = "805197322"
-
-    # url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv&gid={gid}"
-
-    # # Read specified columns into a dataframe
-    # cols = range(1,9)
-    # df = pd.read_csv(url, usecols=cols)
 
     df = das_df.copy(deep=True)
 
-    # Drop blank column and rename columns
-    df = df.drop(['Unnamed: 5'], axis=1)
-    df = df.rename(columns={'Player1': 'Winner', 'Unnamed: 2': 'Wins', 'Unnamed: 3': 'Losses', 'Player2': 'Loser', 'Edition/Round': 'Info', 'Date/Time (UTC)': 'Date'})
+    # # Drop blank column and rename columns
+    # df = df.drop(['Unnamed: 5'], axis=1)
+    # df = df.rename(columns={'Player1': 'Winner', 'Unnamed: 2': 'Wins', 'Unnamed: 3': 'Losses', 'Player2': 'Loser', 'Edition/Round': 'Info', 'Date/Time (UTC)': 'Date'})
 
 
-    # Fill null event entries
-    df['Event'] = df['Event'].fillna("NA")
+    # # Fill null event entries
+    # df['Event'] = df['Event'].fillna("NA")
 
-    # Normalize spellings
-    df['Event'] = df['Event'].str.replace('Das', 'DAS')
-    for x in ['-final', '-Final', '-finals', '-Finals']:
-        df['Info'] = df['Info'].str.replace(x, 'finals')
-    df['Info'] = df['Info'].str.replace('Final', 'Finals')
-    df['Info'] = df['Info'].str.replace('Finalss', 'Finals')
+    # # Normalize spellings
+    # df['Event'] = df['Event'].str.replace('Das', 'DAS')
+    # for x in ['-final', '-Final', '-finals', '-Finals']:
+    #     df['Info'] = df['Info'].str.replace(x, 'finals')
+    # df['Info'] = df['Info'].str.replace('Final', 'Finals')
+    # df['Info'] = df['Info'].str.replace('Finalss', 'Finals')
 
-    # Drop friendly events
-    if drop_friendlies:
-        drop_list = ['Friendlies', 'Friendlies: Retribution', 'Friendlies: Rivals', 'LATAM Friendlies', 'LYMYMI Tournament', 'Tetris Friendlies', 'TNP']
-        df = df[~df['Event'].isin(drop_list)]
+    # # Drop friendly events
+    # if drop_friendlies:
+    #     drop_list = ['Friendlies', 'Friendlies: Retribution', 'Friendlies: Rivals', 'LATAM Friendlies', 'LYMYMI Tournament', 'Tetris Friendlies', 'TNP']
+    #     df = df[~df['Event'].isin(drop_list)]
 
 
-    # Move the winners to column 1
-    switch = df['Wins'] < df['Losses']
-    df.loc[switch, ['Winner', 'Wins', 'Losses', 'Loser']] = df.loc[switch, ['Loser', 'Losses', 'Wins', 'Winner']].values
+    # # Move the winners to column 1
+    # switch = df['Wins'] < df['Losses']
+    # df.loc[switch, ['Winner', 'Wins', 'Losses', 'Loser']] = df.loc[switch, ['Loser', 'Losses', 'Wins', 'Winner']].values
 
-    # Convert dates to datetime format
-    df['Date'] = pd.to_datetime(df['Date'], format='%d/%m/%Y %H:%M:%S')
+    # # Convert dates to datetime format
+    # df['Date'] = pd.to_datetime(df['Date'], format='%d/%m/%Y %H:%M:%S')
 
-    # Replace null values for Event column
-    df['Event'] = df['Event'].fillna('None')
+    # # Replace null values for Event column
+    # df['Event'] = df['Event'].fillna('None')
 
     # Filter data to the given time frame
     time_frame = datetime.now() - timedelta(days = num_years * 365 + 1)
@@ -327,50 +335,13 @@ def playerinfo():
 
     player = request.form.get('player', 'FRACTAL')
     player = player.upper()
-
-
-    # Filter data for events of type Elo or Friendly. Friendly only gives win loss records. 
-    # Set match type to 'ANY' (or any string other than ELO or FRIENDLY) to include friendlies in win-loss record.
-    match_type = 'ELO'
-    possible_types = ['ELO', 'FRIENDLY']
-
-    # Google Sheets CSV export URL format
-    # sheet_id = "1Rw1XT90YD8HvYN4JS0Ba1tgkp7UlrG4ksPuP4Yc4SNM"
-    # gid = "658545272"
-
-    # url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv&gid={gid}"
-
-    # # Read the data into a DataFrame
-    # cols = range(0,12)
-    # df = pd.read_csv(url, usecols=cols)
-
-    # Rename columns and drop space buffer column.
-    # df = df.rename(columns={'Result': 'Winner', 'Unnamed: 2': 'Wins', 'Unnamed: 3': 'Losses', 'Unnamed: 4': 'Loser', 'Date/time': 'Date', 'Round/game': 'Stage', 'Restreamer/location': 'Location'})
-    # df.drop(['Unnamed: 5'], axis = 1, inplace = True) 
-
+    
+    # Make copy of dataframe
     df = ovr_df.copy(deep=True)
-
-    # Filter dataframe to only of specified match type
-    if match_type in possible_types:
-        df = df[df['Type'] == match_type]
-
-    # Some rows have wins < losses. Normalize rows so that the winner is always on the left.
-    switch = df['Wins'] < df['Losses']
-    df.loc[switch, ['Winner', 'Loser', 'Wins', 'Losses']] = df.loc[switch, ['Loser', 'Winner', 'Losses', 'Wins']].values 
-
-    # Convert dates to datetime
-    df['Date'] = pd.to_datetime(df['Date'], format='%d/%m/%Y %H:%M:%S')
 
     # Filter rows with dates within the last n years
     time_frame = datetime.now() - timedelta(days= num_years * 365 + 1)
     df = df[df['Date'] >= time_frame]
-
-    # Reshape dataframe 
-    winners_df = df[['Winner', 'Event', 'Edition', 'Stage', 'Date']].rename(columns={'Winner': 'Player'})
-    winners_df['Outcome'] = 'Win'
-    losers_df = df[['Loser', 'Event', 'Edition', 'Stage', 'Date']].rename(columns={'Loser': 'Player'})
-    losers_df['Outcome'] = 'Lose'
-    df = pd.concat([winners_df, losers_df])
 
     # Enter initial point values for each match at notable events
     df['Points'] = 0
@@ -378,7 +349,6 @@ def playerinfo():
 
     # Make an event results dataframe
     # Columns: Player, Event, Edition, Type, Event Points, Event Result (eg. 'Top 8')
-
     event_results_df = df.groupby(['Player', 'Event', 'Edition'], as_index=False).agg(
         Event_Points = ('Points', lambda points: points_agg(points, df.loc[points.index, 'Event']))
     )
@@ -394,10 +364,12 @@ def playerinfo():
     players_df = players_df[['Player', 'Wins', 'Losses']]
 
     # Add Total Points column to players dataframe
-    # player_points = event_results_df.groupby('Player')['Event_Points'].agg(top_performances, num_performances)
-    # players_df['Total_Points'] = players_df['Player'].map(player_points)
-    # players_df['Total_Points'] = players_df['Total_Points'].fillna(0)
-    # players_df['Total_Points'] = players_df['Total_Points'].astype(int)
+    player_points = event_results_df.groupby('Player')['Event_Points'].agg(top_performances, num_performances)
+    players_df['Total_Points'] = players_df['Player'].map(player_points)
+    players_df['Total_Points'] = players_df['Total_Points'].fillna(0)
+    players_df['Total_Points'] = players_df['Total_Points'].astype(int)
+    players_df = players_df.sort_values(by='Total_Points', ascending=False).reset_index(drop=True)
+    players_df.index += 1
 
     best_results = event_results_df.loc[event_results_df['Player'] == player]
     best_results = best_results[['Event', 'Edition', 'Event_Points', 'Event_Result']].sort_values(by='Event_Points', ascending=False)
@@ -408,15 +380,21 @@ def playerinfo():
     data = best_results.to_dict(orient='records')
 
     # Get player ranking
-    ranking = players_df.loc[players_df['Player'] == player].index.to_list()[0]
+    if players_df['Player'].eq(player).any():
+        ranking = players_df.loc[players_df['Player'] == player].index.to_list()[0]
 
-    # Get win-loss record
-    wins = players_df.loc[players_df['Player'] == player, 'Wins'].values[0]
-    losses = players_df.loc[players_df['Player'] == player, 'Losses'].values[0]
+        # Get win-loss record
+        win_list = players_df.loc[players_df['Player'] == player, 'Wins']
+        loss_list = players_df.loc[players_df['Player'] == player, 'Losses']
 
-    
+        wins = win_list.iloc[0] if not win_list.empty else 0
+        losses = loss_list.iloc[0] if not loss_list.empty else 0
 
-    # Redirect user to login form
+    else: 
+        ranking = len(dasplayers)
+        wins = 0
+        losses = 0
+
     return render_template("playerinfo.html", data=data, player=player, ranking=ranking, wins=wins, losses=losses, eloplayers=eloplayers)
 
 
@@ -432,7 +410,7 @@ def dasplayerinfo():
     player = player.upper()
 
     # Decide whether to drop friendlies or include them
-    drop_friendlies = True
+    # drop_friendlies = True
 
     # Google sheets CSV export URL format
     # sheet_id = "1nEN0MAbueG36UDkpfUsPZEmAMuKif6IcLAmJ8iZhCe8"
@@ -447,35 +425,35 @@ def dasplayerinfo():
     # Drop blank column and rename columns
     df = das_df.copy(deep=True)
 
-    df = df.drop(['Unnamed: 5'], axis=1)
-    df = df.rename(columns={'Player1': 'Winner', 'Unnamed: 2': 'Wins', 'Unnamed: 3': 'Losses', 'Player2': 'Loser', 'Edition/Round': 'Info', 'Date/Time (UTC)': 'Date'})
+    # df = df.drop(['Unnamed: 5'], axis=1)
+    # df = df.rename(columns={'Player1': 'Winner', 'Unnamed: 2': 'Wins', 'Unnamed: 3': 'Losses', 'Player2': 'Loser', 'Edition/Round': 'Info', 'Date/Time (UTC)': 'Date'})
 
 
-    # Fill null event entries
-    df['Event'] = df['Event'].fillna("NA")
+    # # Fill null event entries
+    # df['Event'] = df['Event'].fillna("NA")
 
-    # Normalize spellings
-    df['Event'] = df['Event'].str.replace('Das', 'DAS')
-    for x in ['-final', '-Final', '-finals', '-Finals']:
-        df['Info'] = df['Info'].str.replace(x, 'finals')
-    df['Info'] = df['Info'].str.replace('Final', 'Finals')
-    df['Info'] = df['Info'].str.replace('Finalss', 'Finals')
+    # # Normalize spellings
+    # df['Event'] = df['Event'].str.replace('Das', 'DAS')
+    # for x in ['-final', '-Final', '-finals', '-Finals']:
+    #     df['Info'] = df['Info'].str.replace(x, 'finals')
+    # df['Info'] = df['Info'].str.replace('Final', 'Finals')
+    # df['Info'] = df['Info'].str.replace('Finalss', 'Finals')
 
-    # Drop friendly events
-    if drop_friendlies:
-        drop_list = ['Friendlies', 'Friendlies: Retribution', 'Friendlies: Rivals', 'LATAM Friendlies', 'LYMYMI Tournament', 'Tetris Friendlies', 'TNP']
-        df = df[~df['Event'].isin(drop_list)]
+    # # Drop friendly events
+    # if drop_friendlies:
+    #     drop_list = ['Friendlies', 'Friendlies: Retribution', 'Friendlies: Rivals', 'LATAM Friendlies', 'LYMYMI Tournament', 'Tetris Friendlies', 'TNP']
+    #     df = df[~df['Event'].isin(drop_list)]
 
 
     # Move the winners to column 1
-    switch = df['Wins'] < df['Losses']
-    df.loc[switch, ['Winner', 'Wins', 'Losses', 'Loser']] = df.loc[switch, ['Loser', 'Losses', 'Wins', 'Winner']].values
+    # switch = df['Wins'] < df['Losses']
+    # df.loc[switch, ['Winner', 'Wins', 'Losses', 'Loser']] = df.loc[switch, ['Loser', 'Losses', 'Wins', 'Winner']].values
 
-    # Convert dates to datetime format
-    df['Date'] = pd.to_datetime(df['Date'], format='%d/%m/%Y %H:%M:%S')
+    # # Convert dates to datetime format
+    # df['Date'] = pd.to_datetime(df['Date'], format='%d/%m/%Y %H:%M:%S')
 
-    # Replace null values for Event column
-    df['Event'] = df['Event'].fillna('None')
+    # # Replace null values for Event column
+    # df['Event'] = df['Event'].fillna('None')
 
     # Filter data to the given time frame
     time_frame = datetime.now() - timedelta(days = num_years * 365 + 1)
@@ -491,7 +469,8 @@ def dasplayerinfo():
     # For events with the edition in the event name, move the edition to the edition column
     df['Edition'] = df.apply(split_edition, axis=1).fillna('NA')
     df['Event'] = df.apply(modify_event, axis=1).fillna('NA')
-
+    
+    # Keep selected columns only
     df = df[['Winner', 'Wins', 'Losses', 'Loser', 'Event', 'Edition', 'Stage', 'Date']]
 
 
@@ -597,19 +576,22 @@ def dasplayerinfo():
     # Convert to dictionary to read into html file
     data = best_results.to_dict(orient='records')
 
-    # wins = players_df.loc[players_df['Player'] == player, 'Wins'].values[0]
-    # losses = players_df.loc[players_df['Player'] == player, 'Losses'].values[0]
-
-
     # Get player ranking
-    ranking = players_df.loc[players_df['Player'] == player].index.to_list()[0]
+    if players_df['Player'].eq(player).any():
+        ranking = players_df.loc[players_df['Player'] == player].index.to_list()[0]
 
-    # Get win-loss record
-    win_list = players_df.loc[players_df['Player'] == player, 'Wins']
-    loss_list = players_df.loc[players_df['Player'] == player, 'Losses']
+        # Get win-loss record
+        win_list = players_df.loc[players_df['Player'] == player, 'Wins']
+        loss_list = players_df.loc[players_df['Player'] == player, 'Losses']
 
-    wins = win_list.iloc[0] if not win_list.empty else 0
-    losses = loss_list.iloc[0] if not loss_list.empty else 0
+        wins = win_list.iloc[0] if not win_list.empty else 0
+        losses = loss_list.iloc[0] if not loss_list.empty else 0
+
+    else: 
+        ranking = len(dasplayers)
+        wins = 0
+        losses = 0
+
 
 
     # Redirect user to login form
