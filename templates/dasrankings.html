@@ -31,29 +31,31 @@ Player Search
     The rankings below display the top {{ num_players }} ranked DAS players, ranked by their top {{ num_performances }} performances over the past {{ num_years }} years. 
 </p>
 
-    <div>
-        <h2>Player Rankings</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Player</th>
-                    <th>Wins</th>
-                    <th>Losses</th>
-                    <th>Total Event Points</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for row in data %}
-                <tr>
-                    <td>{{ row["Player"] }}</td>
-                    <td>{{ row["Wins"] }}</td>
-                    <td>{{ row["Losses"] }}</td>
-                    <td>{{ row["Total_Points"] }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+<div>
+    <h2>DAS Player Rankings</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Rank</th>
+                <th scope="col">Player</th>
+                <th scope="col">Wins</th>
+                <th scope="col">Losses</th>
+                <th scope="col">Total Event Points</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in data %}
+            <tr>
+                <th scope="row"> {{ row["index"] }} </th>
+                <td>{{ row["Player"] }}</td>
+                <td>{{ row["Wins"] }}</td>
+                <td>{{ row["Losses"] }}</td>
+                <td>{{ row["Total_Points"] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 
 
 

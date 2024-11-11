@@ -1,0 +1,65 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Player Rankings
+{% endblock %}
+
+{% block body %}
+<h1>Top Classic Tetris Players</h1>
+
+<p>
+    This merit based ranking assigns each player a certain amount of points according to how far they got in each tournament they participated in. Success across different events may result in different amounts of points awarded, depending on how large the event, the quality of competition, and the prestige and prize pool behind the event. 
+</p>
+<p>
+    These rankings by default count the top 10 results for players over the past 2 years. You may adjust these defaults, as well as how many players are displayed, with the forms below. 
+</p>
+<h2>Select Display Options</h2>
+<form action="/" method="POST">
+    <label for="num_players">Number of Players to Display:</label>
+    <input type="number" id="num_players" name="num_players" min="1" required><br><br>
+
+    <label for="num_top_performances">Number of Top Performances:</label>
+    <input type="number" id="num_top_performances" name="num_top_performances" min="1" required><br><br>
+
+    <label for="num_years">Number of Years:</label>
+    <input type="number" id="num_years" name="num_years" min="1" max="10" required><br><br>
+
+    <input type="submit" value="Submit">
+</form>
+
+<p>
+    The rankings below display the top {{ num_players }} ranked overall players, ranked by their top {{ num_performances }} performances over the past {{ num_years }} years. 
+</p>
+
+
+    <div>
+        <h2>Player Rankings</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Rank</th>
+                    <th scope="col">Player</th>
+                    <th scope="col">Wins</th>
+                    <th scope="col">Losses</th>
+                    <th scope="col">Total Event Points</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in data %}
+                <tr>
+                    <th scope="row"> {{ row["index"] }} </th>
+                    <td>{{ row["Player"] }}</td>
+                    <td>{{ row["Wins"] }}</td>
+                    <td>{{ row["Losses"] }}</td>
+                    <td>{{ row["Total_Points"] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+
+
+
+
+{% endblock %}

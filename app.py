@@ -96,6 +96,11 @@ das_df['Event'] = das_df['Event'].fillna('None')
 
 
 @app.route('/', methods=['GET', 'POST'])
+def home():
+    return render_template('index.html')
+
+
+@app.route('/rankings', methods=['GET', 'POST'])
 def rankings():
     # Filter data for only the prior n years
     num_years = int(request.form.get('num_years', 2))
@@ -145,11 +150,12 @@ def rankings():
     players_df = players_df.head(num_top_players)
 
     # Convert to dictionary to read into html file
-    data = players_df.to_dict(orient='records')
+    data = players_df.reset_index().to_dict(orient='records')
+
     
 
 
-    return render_template('index.html', data=data, num_years=num_years, num_performances=num_performances, num_top_players=num_top_players)
+    return render_template('rankings.html', data=data, num_years=num_years, num_performances=num_performances, num_top_players=num_top_players)
 
 
 @app.route("/dasrankings", methods=['GET', 'POST'])
@@ -320,7 +326,7 @@ def dasrankings():
     players_df = players_df.head(num_top_players)
     
     # Convert to dictionary to read into html file
-    data = players_df.to_dict(orient='records')
+    data = players_df.reset_index().to_dict(orient='records')
 
     return render_template('dasrankings.html', data=data, num_years=num_years, num_performances=num_performances, num_top_players=num_top_players)
 
@@ -406,7 +412,7 @@ def dasplayerinfo():
     # Count the top n performances in the given timeframe
     num_performances = int(request.form.get('num_top_performances', 6))
 
-    player = request.form.get('player', 'FRACTAL')
+    player = request.form.get('player', 'Pixelandy')
     player = player.upper()
 
     # Decide whether to drop friendlies or include them

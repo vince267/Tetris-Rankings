@@ -32,7 +32,7 @@ Player Info
 </form>
 
 <p>
-    The summary below displays the top {{ num_performances }} performances for {{ player }} over the past {{ num_years }} years. 
+    The summary below displays the top {{ num_performances }} (or less) performances for {{ player }} over the past {{ num_years }} years. 
 </p>
 
 <h2>Player Summary for {{ player }}</h2>
@@ -40,19 +40,19 @@ Player Info
 <p>Win-loss record: {{ wins }}-{{ losses }}</p>
 
     <div>
-        <table>
+        <table class="table">
             <thead>
                 <tr>
-                    <th>Event</th>
-                    <th>Edition</th>
-                    <th>Points</th>
-                    <th>Result</th>
+                    <th scope="col">Event</th>
+                    <th scope="col">Edition</th>
+                    <th scope="col">Points</th>
+                    <th scope="col">Result</th>
                 </tr>
             </thead>
             <tbody>
                 {% for row in data %}
                 <tr>
-                    <td>{{ row["Event"] }}</td>
+                    <td scope="row">{{ row["Event"] }}</td>
                     <td>{{ row["Edition"] }}</td>
                     <td>{{ row["Event_Points"] }}</td>
                     <td>{{ row["Event_Result"] }}</td>
