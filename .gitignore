@@ -13,6 +13,16 @@ __pycache__/
 # macOS specific
 .DS_Store
 
+# Ignore compiled CSS files
+*.css
+*.css.map
+
+# Ignore node_modules if using npm or yarn
+node_modules/
+
+# Ignore Sass cache files if they exist
+.sass-cache/
+
 # VS Code settings
 .vscode/
 
@@ -35,10 +45,6 @@ instance/
 
 # Configuration
 config.py
-
-# Ignoring the data file or database, if applicable
-*.db
-*.csv
 
 # Pytest cache
 .pytest_cache/

@@ -1,6 +1,22 @@
 // Override default Bootstrap variables here
-$primary: #3498db;  // Set primary color to a custom blue
-$secondary: #2ecc71;  // Set secondary color to a custom green
+$primary: #0ce44d;  // Set primary color to a custom blue
+$secondary: #6c2980;  // Set secondary color to a custom green
+$margin: 16px;
+
+
+.border {
+    padding: $margin;
+    margin: $margin;
+    border-color: $primary;
+  } 
+
+.table {
+    padding: $margin;
+    color: $primary;
+}
+
+
+  
 
 // Import Bootstrap
-@import "node_modules/bootstrap/scss/bootstrap";
+@import "../node_modules/bootstrap/scss/bootstrap";

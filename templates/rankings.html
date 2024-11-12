@@ -5,16 +5,16 @@ Player Rankings
 {% endblock %}
 
 {% block body %}
-<h1>Top Classic Tetris Players</h1>
+<h1 class="p-3">Top Classic Tetris Players</h1>
 
-<p>
+<p class="p-3">
     This merit based ranking assigns each player a certain amount of points according to how far they got in each tournament they participated in. Success across different events may result in different amounts of points awarded, depending on how large the event, the quality of competition, and the prestige and prize pool behind the event. 
-</p>
-<p>
+    <br>
+    <br>
     These rankings by default count the top 10 results for players over the past 2 years. You may adjust these defaults, as well as how many players are displayed, with the forms below. 
 </p>
-<h2>Select Display Options</h2>
-<form action="/" method="POST">
+<h2 class="p-3">Select Display Options</h2>
+<form action="/" class="p-3" method="POST">
     <label for="num_players">Number of Players to Display:</label>
     <input type="number" id="num_players" name="num_players" min="1" required><br><br>
 
@@ -27,12 +27,12 @@ Player Rankings
     <input type="submit" value="Submit">
 </form>
 
-<p>
+<p class="p-3">
     The rankings below display the top {{ num_players }} ranked overall players, ranked by their top {{ num_performances }} performances over the past {{ num_years }} years. 
 </p>
 
 
-    <div>
+    <div class="p-3">
         <h2>Player Rankings</h2>
         <table class="table">
             <thead>
