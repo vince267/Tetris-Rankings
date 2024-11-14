@@ -5,44 +5,59 @@ Player Info
 {% endblock %}
 
 {% block body %}
-<h1>DAS Player Info</h1>
+<h1 class="p-3 text-center bg-primary text-white rounded mb-4">DAS Player Info</h1>
 
-<p>
-    Choose a player to display a summary of their best results in DAS only tournaments. The ranking compares the player's performances in the given time frame to other DAS players in the same time frame. These rankings by default count the top 6 DAS results for players over the past 2 years. You may adjust these defaults with the forms below. 
-</p>
+<div class="container">
+    <p class="lead mb-4">
+        Choose a player to display a summary of their best results in DAS only tournaments. The ranking compares the player's performances in the given time frame to other DAS players in the same time frame. These rankings by default count the top 6 DAS results for players over the past 2 years. You may adjust these defaults with the forms below. 
+    </p>
+</div>
 
-<h2>Select Display Options</h2>
-<form action="/dasplayerinfo" method="POST">
-    <label for="player">Player name</label>
-    <input list="dasplayers" id="player" name="player" required>
-    <datalist id="dasplayers">
-        {% for player in dasplayers %}
-            <option value="{{ player }}">
-        {% endfor %}
-    </datalist>
-    <!-- <input type="text" id="player" name="player" required> -->
-    <br><br>
+<div class="container">
+    <p class="mb-4">
+        The summary below displays the top {{ num_performances }} (or less) performances for {{ player }} over the past {{ num_years }} years. 
+    </p>
+</div>
 
-    <label for="num_top_performances">Number of Top Performances:</label>
-    <input type="number" id="num_top_performances" name="num_top_performances" min="1" required><br><br>
+<div class="d-flex justify-content-center align-items-center">
+    <div class="p-3 w-25">
+        <h2 class="text-center mb-4">Select Display Options</h2>
+        <form action="/dasplayerinfo" method="POST">
 
-    <label for="num_years">Number of Years:</label>
-    <input type="number" id="num_years" name="num_years" min="1" max="10" required><br><br>
+            <div class="mb-3 text-center">
+                <label for="player" class="form-label">Player Name:</label>
+                <input class="form-control form-control-sm" list="eloplayers" id="player" name="player" required>
+                <datalist id="eloplayers">
+                    {% for player in eloplayers %}
+                        <option value="{{ player }}">
+                    {% endfor %}
+                </datalist>
+            </div>
 
-    <input type="submit" value="Submit">
-</form>
+            <div class="mb-3 text-center">
+                <label for="num_top_performances" class="form-label">Number of Top Performances:</label>
+                <input type="number" class="form-control form-control-sm" id="num_top_performances" name="num_top_performances" min="1" required>
+            </div>
 
-<p>
-    The summary below displays the top {{ num_performances }} (or less) performances for {{ player }} over the past {{ num_years }} years. 
-</p>
+            <div class="mb-3 text-center">
+                <label for="num_years" class="form-label">Number of Years:</label>
+                <input type="number" class="form-control form-control-sm" id="num_years" name="num_years" min="1" max="10" required>
+            </div>
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary mb-3 w-50">Submit</button>
+            </div>
+        </form>
+    </div>
+</div>
 
-<h2>Player Summary for {{ player }}</h2>
-<p>Ranked {{ ranking }} overall. </p>
-<p>Win-loss record: {{ wins }}-{{ losses }}</p>
-
-<div>
-    <table class="table">
-        <thead>
+<div class="container p-4">
+    <div class="text-center mb-4">
+        <h2 class="display-5">Player Summary for {{ player }}</h2>
+        <p class="lead">Ranked <strong>{{ ranking }}</strong> overall</p>
+        <p>Win-loss record: <span class="fw-bold">{{ wins }}</span>-<span class="fw-bold">{{ losses }}</span></p>
+    </div>
+    <table class="table table-striped table-bordered table-hover">
+        <thead class="thead-dark">
             <tr>
                 <th scope="col">Event</th>
                 <th scope="col">Edition</th>
@@ -62,9 +77,6 @@ Player Info
         </tbody>
     </table>
 </div>
-
-
-
 
 
 {% endblock %}

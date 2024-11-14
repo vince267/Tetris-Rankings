@@ -5,7 +5,73 @@ Home
 {% endblock %}
 
 {% block body %}
-<h1>Ranking Classic Tetris Players</h1>
+
+<!-- Hero Section -->
+<div class="container-fluid bg-dark text-white text-center py-5">
+    <h1 class="display-4">Ranking Classic Tetris Players</h1>
+    <p class="lead">Explore the evolution and merit-based ranking of the best NES Tetris players.</p>
+</div>
+
+<!-- Main Content Section -->
+<div class="container my-5">
+    <!-- Background and History -->
+    <section class="mb-5">
+        <h2 class="text-primary"><i class="fas fa-history"></i> Background and History</h2>
+        <p>
+            The classis 1989 version of Tetris on the NES has gained an increasing amount of popularity since the annual Classic Tetris World Championship (CTWC) was introduced in 2010. The game has pulled in more players every year as players continue to push the boundaries of the game and break our perceptions of what is possible for humans to achieve. 
+        </p>
+
+        <p>
+            The purpose of the original CTWC was to simply determine who was the best player in the world at NES Tetris. The winner of the first event, Jonas Neubauer, then proceeded to win 7 of the next 8 annual CTWC events, losing only once in the finals to Harry Hong in 2014. Over this span of time, it was clear to everyone who the world's best NES Tetris player. But in the 2018 CTWC finals, Jonas was dethroned by the young rising star Joseph Saelee, who had been playing with the rare hypertapping playstyle. This match in large part helped bring a new wave of young players to the NES Tetris scene, motivated by the incredible performance of Saelee along with the inclusive environment that had been fostered by the people in the Classic Tetris community.
+        </p>
+    </section>
+
+    <!-- Ranking System Section -->
+    <section class="mb-5">
+        <h2 class="text-primary"><i class="fas fa-trophy"></i> An Increasing Need for a Ranking System</h2>
+        <p>After Joseph Saelee won the CTWC back to back in 2018-19, Michael "DogPlayingTetris" Artiaga won back to back in 2020-21, followed by a new winner in each of 2022-24. During this time frame, many other tournaments started being organized to fill in the gaps around the annual CTWC event. The most notable of these tournaments is Classic Tetris Monthly (CTM), a monthly online tournament for NES Tetris. The event began in 2017 and its online format has allowed players from all over the world take place in classic tetris competitions, which over time has increased the competitive level of the event. The tournament has players submit qualifying scores and typically the 16 highest scores then compete in the main event, called the CTM Masters Event. Each subsequent 16 scores are grouped into tiers as well, with each tier playing a tournament and crowning a winner. The tiers are named the CTM Challengers Circuit, Futures Circuit, Hopefuls Circuit, Community T1, Community T2, and so on. The winner of each of the lower tiered events is guaranteed a spot in the next highest tiered tournament for the following month (for example, the winner of the June Challengers Circuit will be guaranteed a spot in the July Masters Event). </p>
+
+        <p>Eventualy, the competition level of CTM has risen to rival and occasionally surpass that of the CTWC. However, due to the monthly format, the level of competition varies from month to month, so CTM introduced its own version of a major tournament in 2023, CTM Mega Masters. The same year, CTM also introduced its own version of an in-person major tournament, CTM Lone Star. The events have thus far served their purpose, bringing in a consistent level of competition similar to that of the CTWC from year to year. </p>
+
+        <p>With the number of tournaments increasing each year, determining the best player in NES Tetris has gotten less and less straightforward. If a player wins every CTM Masters Event in a year, but loses in the CTWC finals to another player, who would you consider the world's best tetris player? The Tetris community has done an immense amount of work compiling match data and statistics in order to quantify player performance, and has even compiled the data in order to rank players using the ELO Rating System, which rates players according to head to head performances across all events. In ELO ratings, a player increases their ELO rating by winning against other players, with wins against higher rated players giving the player a higher boost in their own ELO rating. </p>
+    </section>
+
+    <!-- ELO Advantages and Drawbacks -->
+    <section class="mb-5">
+        <h2 class="text-primary"><i class="fas fa-balance-scale"></i> Every Good Statistic Has a Drawback</h2>
+        <p>One might wonder for a game with such an emphasis on individual scores such as tetris, compared to games like chess and tennis which require more direct interaction between players, why not simply look at individual statistics to decide who the best players are? There are already a wealth of statistics available to draw from, such as a player's personal best score (either in or out of competition) or a player's average or median score in competition. However, all of these statistics, while meaningful, have their own drawbacks. For example, a player that is very good at getting extremely high scores outside of competition might be more prone to making risky decisions in game that lead to early topouts (i.e. game overs), usually resulting in a loss in competition. Also, when the goal in competition is to simply score more than your opponent in each given game, the ideal strategy for a top player is not to score as high as they possibly can, but rather to play in a way that maximizes their probability of scoring higher than their opponent in that given game. If the opponent has never scored more than 800,000 in a game, there is no sense in a top player playing in a way that results in a score of 1,000,000 if it makes them more likely to have an early topout in the game. Even when comparing players of equal skill across different matches, their scores will often be dependent on how lucky their piece distributions are for their given games. For example, if a player gets 110 I-pieces in a game, compared to only 70 I-pieces in a different game, they will have the potential to score a lot more points in the game with more I-pieces. </p>
+        
+        <p>Other statistics have been introduced, such as fair median score, that attempt to mitigate some of these issues. The statistics are all meaningful in their own way, but also all have their own inherent downsides. The best rating system would likely be one that simply measures how likely one player is to beat another player, which is precisely what the aforementioned ELO rating system does. However, one flaw of the ELO rating system is that it does not take into account which event a player beats another player in. In reality, we often perceive the best player according to how well they do on the biggest stage, hence why there is value in an alternate ranking system that values player performances in the events with the highest prize pools, viewership, and prestige. Competing in these events also brings its own challenges compared to playing a match with little to no people watching. Players train to be playing their best at these events, and competing with the weight of the high viewership and prize pools can be very difficult for competitors. </p>
+        
+        <p>Determining the best player or team in a given sport or competition can vary a lot. In baseball, society has more or less decided that the best team is simply the one that wins the World Series in a given season. Determining the best player, however, it a much deeper rabbit hole that looks at a wealth of information. Some of the information comes from concrete data like batting average, on base percentage, or home runs. Some comes from more abstract data, such as wins above replacement or OPS+. And some comes from information that is not concrete at all, like the eye test. None of this information is bad, it just all comes with a grain of salt. </p>
+    </section>
+
+    <!-- Merit-Based Ranking System -->
+    <section class="mb-5">
+        <h2 class="text-primary"><i class="fas fa-medal"></i> A Merit-Based Ranking System</h2>
+        <p>In this project, we look to the ATP Tennis Rankings to gain new insight on player performance in Tetris. The ATP Rankings are a merit-based ranking system used by the Association of Tennis Professionals to rank players according to their performance at events. The ranking system assigns points to players according to how far in a given tournament each player went, with higher tiered tournaments giving more points. We will take this ranking system and apply it to NES Tetris, considering the major tournaments to be the CTWC, CTM Mega Masters, and CTM Lone Star. We will also weight the CTM Masters Event as a sub-major, and the lower tiered CTM tournaments as minor tournaments with increasingly smaller point pools. While no ranking system should replace the current ELO rating system, we hope this ranking will give a new look at how players compare against each other in a way that values performance at the biggest events. </p>
+    </section>
+
+    <!-- New Playstyles -->
+    <section class="mb-5">
+        <h2 class="text-primary"><i class="fas fa-gamepad"></i> New Playstyles</h2>
+        <p>Before 2018, Hypertapping was a rare and difficult playstyle, first popularized by Thor Ackerlund and Koji "Koryan" Nishio. At the time, the majority of players played the game moving pieces left and right by simply pressing and holding the directional button. This common playstle is referred to as the DAS playstyle, since it uses the game's Delayed Auto Shift to move the pieces. The hypertapping playstle can be summarized as the player rapidly pressing the left or right buttons to move pieces faster than the game would move the pieces if the player were to simply press and hold the left or right buttons. </p>
+
+        <p>In November 2020, a new playstle called "rolling" was developed by Christopher "CheeZ" Martinez. The rolling playstyle can be summarized as using all five fingers in order to press the directional buttons rapidly. This is in contrast to hypertapping, which typically uses only one finger (usually the thumb or index finger). Rolling allows the player to regularly register inputs as fast as 30hz, which is the maximum speed that the game will count inputs. In contrast, hypertapping usually results in inputs registered around 12-15hz, and DAS will only move pieces at 10hz. </p>
+        
+        <p>Since rolling was introduced, nearly all of the top players have adopted the playstyle. The playstyle has such a large advantage over DAS and hypertapping that players who use DAS are usually very unlikely to win against players who use rolling. This, combined with the fact that rolling and hypertapping have large relative injury risks compared to the DAS playstyle, has resulted in an increasing demand for tournaments which only allow players to use the DAS playstyle. </p>
+        
+        <p>A large number of DAS tournaments have since began, including CTWC DAS, CTM DAS Masters, the Jonas Cup, Classic Tetris DAS, and the DAS Champions League. The community has also categorized many matches according to whether or not the two players exclusively used DAS. This has allowed the community to also develop a DAS ELO system to rank the best players using the DAS playstyle. Since this project is well equipped to do so, we also provide a DAS ATP Ranking of players for NES Tetris. </p>
+    </section>
+
+    <!-- Call to Action Button -->
+    <section class="text-center my-5">
+        <a href="/rankings" class="btn btn-primary btn-lg my-3">Explore Player Rankings</a>
+    </section>
+</div>
+
+
+<!-- <h1>Ranking Classic Tetris Players</h1>
 
 <h3>BACKGROUND AND HISTORY</h3>
 
@@ -44,7 +110,7 @@ Home
 <p>A large number of DAS tournaments have since began, including CTWC DAS, CTM DAS Masters, the Jonas Cup, Classic Tetris DAS, and the DAS Champions League. The community has also categorized many matches according to whether or not the two players exclusively used DAS. This has allowed the community to also develop a DAS ELO system to rank the best players using the DAS playstyle. Since this project is well equipped to do so, we also provide a DAS ATP Ranking of players for NES Tetris. </p>
 
 
-
+ -->
 
 
 {% endblock %}

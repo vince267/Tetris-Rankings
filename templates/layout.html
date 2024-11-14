@@ -11,8 +11,7 @@
     <link rel="stylesheet" href="statics/main.css">
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <!-- <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
           <a class="navbar-brand" href="/">Home</a>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
@@ -27,7 +26,26 @@
             </div>
           </div>
         </div>
-      </nav>
+      </nav> -->
+    
+      <!-- Navbar -->
+      <nav class="navbar navbar-expand-lg bg-tertiary border-bottom shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">Home</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                <div class="navbar-nav">
+                    <a class="nav-link" href="/rankings">Rankings</a>
+                    <a class="nav-link" href="/dasrankings">DAS Rankings</a>
+                    <a class="nav-link" href="/playerinfo">Player Info</a>
+                    <a class="nav-link" href="/dasplayerinfo">DAS Player Info</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+          
 
     {% block body %}{% endblock %}
 

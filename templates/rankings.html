@@ -5,61 +5,73 @@ Player Rankings
 {% endblock %}
 
 {% block body %}
-<h1 class="p-3">Top Classic Tetris Players</h1>
+<h1 class="p-3 text-center bg-primary text-white rounded mb-4">Top Classic Tetris Players</h1>
 
-<p class="p-3">
-    This merit based ranking assigns each player a certain amount of points according to how far they got in each tournament they participated in. Success across different events may result in different amounts of points awarded, depending on how large the event, the quality of competition, and the prestige and prize pool behind the event. 
-    <br>
-    <br>
-    These rankings by default count the top 10 results for players over the past 2 years. You may adjust these defaults, as well as how many players are displayed, with the forms below. 
-</p>
-<h2 class="p-3">Select Display Options</h2>
-<form action="/" class="p-3" method="POST">
-    <label for="num_players">Number of Players to Display:</label>
-    <input type="number" id="num_players" name="num_players" min="1" required><br><br>
+<div class="container">
+    <p class="lead mb-4">
+        This merit based ranking assigns each player a certain amount of points according to how far they got in each tournament they participated in. Success across different events may result in different amounts of points awarded, depending on the size of the event, the quality of competition, and the prestige and prize pool behind the event. 
+    </p>
+    
+    <p class="mb-4">
+        These rankings by default count the top 10 results for players over the past 2 years. You may adjust these defaults, as well as how many players are displayed, with the forms at the bottom of the page. 
+    </p>
+</div>
 
-    <label for="num_top_performances">Number of Top Performances:</label>
-    <input type="number" id="num_top_performances" name="num_top_performances" min="1" required><br><br>
+<div class="container">
+    <p class="mb-4">
+        The rankings below display the top {{ num_players }} ranked overall players, ranked by their top {{ num_performances }} performances over the past {{ num_years }} years. 
+    </p>
+</div>
 
-    <label for="num_years">Number of Years:</label>
-    <input type="number" id="num_years" name="num_years" min="1" max="10" required><br><br>
+<div class="container p-3">
+    <h2 class="text-center">Player Rankings</h2>
+    <table class="table table-striped table-bordered table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Rank</th>
+                <th scope="col">Player</th>
+                <th scope="col">Wins</th>
+                <th scope="col">Losses</th>
+                <th scope="col">Total Event Points</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in data %}
+            <tr>
+                <th scope="row"> {{ row["index"] }} </th>
+                <td>{{ row["Player"] }}</td>
+                <td>{{ row["Wins"] }}</td>
+                <td>{{ row["Losses"] }}</td>
+                <td>{{ row["Total_Points"] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 
-    <input type="submit" value="Submit">
-</form>
+<div class="d-flex justify-content-center align-items-center">
+    <div class="p-3 w-25">
+        <h2 class="text-center mb-4">Select Display Options</h2>
+        <form action="/rankings" method="POST">
+            <div class="mb-3 text-center">
+                <label for="num_players" class="form-label">Number of Players to Display:</label>
+                <input type="number" class="form-control form-control-sm" id="num_players" name="num_players" min="1" required>
+            </div>
 
-<p class="p-3">
-    The rankings below display the top {{ num_players }} ranked overall players, ranked by their top {{ num_performances }} performances over the past {{ num_years }} years. 
-</p>
+            <div class="mb-3 text-center">
+                <label for="num_top_performances" class="form-label">Number of Top Performances:</label>
+                <input type="number" class="form-control form-control-sm" id="num_top_performances" name="num_top_performances" min="1" required>
+            </div>
 
-
-    <div class="p-3">
-        <h2>Player Rankings</h2>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th scope="col">Rank</th>
-                    <th scope="col">Player</th>
-                    <th scope="col">Wins</th>
-                    <th scope="col">Losses</th>
-                    <th scope="col">Total Event Points</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for row in data %}
-                <tr>
-                    <th scope="row"> {{ row["index"] }} </th>
-                    <td>{{ row["Player"] }}</td>
-                    <td>{{ row["Wins"] }}</td>
-                    <td>{{ row["Losses"] }}</td>
-                    <td>{{ row["Total_Points"] }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+            <div class="mb-3 text-center">
+                <label for="num_years" class="form-label">Number of Years:</label>
+                <input type="number" class="form-control form-control-sm" id="num_years" name="num_years" min="1" max="10" required>
+            </div>
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary mb-3 w-50">Submit</button>
+            </div>
+        </form>
     </div>
-
-
-
-
+</div>
 
 {% endblock %}
